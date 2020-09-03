@@ -1,0 +1,3 @@
+2020-02-13T23:58:27.2661697+05:30  [INF] Starting HeartBeat (a49444be)
+2020-02-13T23:58:29.9947234+05:30 80000011-0006-fb00-b63f-84710c7967bb [INF] Request starting HTTP/2.0 GET https://localhost:44338/api/values   (ca22a1cb)
+2020-02-13T23:58:30.2163305+05:30 80000011-0006-fb00-b63f-84710c7967bb [INF] Request finished in 223.7882ms 404  (791a596a)

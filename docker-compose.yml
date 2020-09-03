@@ -1,0 +1,85 @@
+version: '3.4'
+
+services:
+  authapi:
+    image: ${DOCKER_REGISTRY-}authapi
+    build:
+      context: .
+      dockerfile: AuthApi/Dockerfile
+    ports: 
+      - "9898:80"
+      - "9899:443"
+    environment:
+      - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/"
+
+  deliveryapi:
+    image: ${DOCKER_REGISTRY-}deliveryapi
+    build:
+      context: .
+      dockerfile: DeliveryApi/Dockerfile
+    ports:
+      - "9908:80"
+      - "9909:443"
+    depends_on:
+        - rabbitmq
+
+
+  ordersapi:
+    image: ${DOCKER_REGISTRY-}ordersapi
+    build:
+      context: .
+      dockerfile: OrdersAPI/Dockerfile
+    ports:
+      - "9905:80"
+      - "9906:443"
+    depends_on:
+        - rabbitmq
+
+
+  paymentapi:
+    image: ${DOCKER_REGISTRY-}paymentapi
+    build:
+      context: .
+      dockerfile: PaymentAPI/Dockerfile
+
+
+  productsapi:
+    image: ${DOCKER_REGISTRY-}productsapi
+    build:
+      context: .
+      dockerfile: ProductsAPI/Dockerfile
+    ports: 
+      - "9896:80"
+      - "9897:443"
+
+  common:
+    image: ${DOCKER_REGISTRY-}common
+    build:
+      context: .
+      dockerfile: Common/Dockerfile
+
+  apigateway:
+    image: ${DOCKER_REGISTRY-}apigateway
+    build:
+      context: .
+      dockerfile: APIGateway/Dockerfile
+
+    depends_on:
+        - eureka
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+    hostname: localhost
+  
+  eureka:
+    image: steeltoeoss/eureka-server:latest
+    expose:
+     - "8761"
+    ports: 
+     - "8761:8761"
+    container_name: eureka
+ 

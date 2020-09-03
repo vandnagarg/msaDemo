@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuthApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,10 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Steeltoe.Discovery.Client;
 
-namespace ProductsAPI
+namespace AuthApi
 {
     public class Startup
     {
@@ -29,32 +27,18 @@ namespace ProductsAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var appSettingsSection = Configuration.GetSection("JWTAuthentication").GetSection("SecurityKey");
-            services.Configure<string>(appSettingsSection);
-
-            // configure jwt authentication
-            var appSettings = appSettingsSection.Get<string>();
-            var key = Encoding.ASCII.GetBytes(appSettings);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
-                    {
-                        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateIssuerSigningKey = true,
-                            ValidIssuer = "authApi",
-                            ValidAudience = "api_gateway",
-                            IssuerSigningKey = new SymmetricSecurityKey(key)
-                        };
-                    });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                    builder => builder.AllowAnyOrigin());
+            });
             services.AddDiscoveryClient(Configuration);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.Configure<JWTAuthentication>(Configuration.GetSection("JwtAuthentication"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,ILoggerFactory  loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -66,8 +50,8 @@ namespace ProductsAPI
                 app.UseHsts();
             }
             loggerFactory.AddFile("Logs/logs.text");
+            app.UseCors();
             app.UseDiscoveryClient();
-            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

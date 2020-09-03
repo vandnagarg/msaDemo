@@ -7,17 +7,17 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
 WORKDIR /src
-COPY ["ProductsAPI/ProductsAPI.csproj", "ProductsAPI/"]
+COPY ["DeliveryApi/DeliveryApi.csproj", "DeliveryApi/"]
 COPY ["Common/Common.csproj", "Common/"]
-RUN dotnet restore "ProductsAPI/ProductsAPI.csproj"
+RUN dotnet restore "DeliveryApi/DeliveryApi.csproj"
 COPY . .
-WORKDIR "/src/ProductsAPI"
-RUN dotnet build "ProductsAPI.csproj" -c Release -o /app/build
+WORKDIR "/src/DeliveryApi"
+RUN dotnet build "DeliveryApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ProductsAPI.csproj" -c Release -o /app/publish
+RUN dotnet publish "DeliveryApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ProductsAPI.dll"]
+ENTRYPOINT ["dotnet", "DeliveryApi.dll"]

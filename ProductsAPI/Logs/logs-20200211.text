@@ -1,0 +1,2 @@
+2020-02-11T19:10:23.4694989+05:30 80000006-0002-ff00-b63f-84710c7967bb [INF] Request starting HTTP/2.0 GET https://localhost:44338/api/values   (ca22a1cb)
+2020-02-11T19:10:23.6407572+05:30 80000006-0002-ff00-b63f-84710c7967bb [INF] Request finished in 176.6571ms 404  (791a596a)
